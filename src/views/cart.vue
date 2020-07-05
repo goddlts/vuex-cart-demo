@@ -20,6 +20,7 @@
           slot="header"
           slot-scope="scope"
           size="mini"
+          v-model="checkedAll"
           >
         </el-checkbox>
         <!-- eslint-enable -->
@@ -32,6 +33,10 @@
           <el-checkbox
             size="mini"
             :value="scope.row.isChecked"
+            @change="updateProductChecked({
+              prodId: scope.row.id,
+              checked: $event
+            })"
           >
           </el-checkbox>
         </template>
@@ -47,31 +52,67 @@
       <el-table-column
         prop="count"
         label="数量">
-        <template>
-          <el-input-number size="mini"></el-input-number>
+        <template slot-scope="scope">
+          <el-input-number
+            size="mini"
+            controls-position="right"
+            :min="1"
+            :value="scope.row.count"
+            @change="updateProductCount({
+              prodId: scope.row.id,
+              count: $event
+            })"
+          ></el-input-number>
         </template>
       </el-table-column>
       <el-table-column
-        prop="price"
+        prop="totalPrice"
         label="小计">
       </el-table-column>
       <el-table-column
         label="操作">
-        <template>
-          <el-button size="mini">删除</el-button>
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            @click="deleteFromCart(scope.row.id)"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div>
-      <p>已选 <span>xxx</span> 件商品，总价：<span>xxx</span></p>
+      <p>已选 <span>{{ checkedTotalCount }}</span> 件商品，总价：<span>{{ checkedTotalPrice }}</span></p>
       <el-button type="danger">结算</el-button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations, mapGetters } from 'vuex'
 export default {
-  name: 'Cart'
+  name: 'Cart',
+  computed: {
+    ...mapState('cart', ['cartProducts']),
+    ...mapGetters('cart', ['checkedTotalCount', 'checkedTotalPrice']),
+    checkedAll: {
+      get () {
+        if (this.cartProducts.length === 0) {
+          return false
+        }
+        return this.cartProducts.every(prod => prod.isChecked)
+      },
+      set (value) {
+        this.updateAllProductsChecked(value)
+      }
+    }
+  },
+  methods: {
+    ...mapMutations('cart', [
+      'updateAllProductsChecked',
+      'updateProductChecked',
+      'updateProductCount',
+      'deleteFromCart'
+    ])
+  }
 }
 </script>
 
