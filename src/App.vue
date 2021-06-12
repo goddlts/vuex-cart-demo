@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div>
-      <span class="title">Vuex - 购物车示例</span>
+      <span class="title">Vuex ---- 购物车示例</span>
       <pop-cart class="pop-cart" />
     </div>
     <router-view />
